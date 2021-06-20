@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <title>囲みマス</title>
+    <link rel="stylesheet" href="codemirror/codemirror.css">
+    <link rel="stylesheet" href="desktop.css">
+    <script src="codemirror/codemirror.js"></script>
+    <script src="codemirror/javascript.js"></script>
+    <script src="native.js"></script>
+    <script src="desktop.js"></script>
+  </head>
+  <body onload="init()">
+    <div class="sidebar">
+      <fieldset>
+        <legend>準備</legend>
+        <button onclick="installDeno()">Denoをインストール</button>
+        <button onclick="runServer()">サーバを起動</button>
+      </fieldset>
+      <fieldset>
+        <legend>コード</legend>
+        <select id="p1"></select>
+        <div style="display: flex;">
+          <button onclick="loadSrc()">開く</button>
+          <button onclick="openNewAIDialog()">新規</button>
+          <button onclick="saveSrc()">保存</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>相手</legend>
+        <select id="p2"></select>
+        <div style="display: flex;">
+          <button onclick="battle()">対戦</button>
+          <button onclick="benchmark()">ベンチマーク</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>大会</legend>
+        <button onclick="openBrowser()">大会サイトを開く</button>
+        <div>
+          ログインしてアクセスキーを取得してください
+        </div>
+        <button>AIをサーバに接続</button><br>
+      </fieldset>
+    </div>
+    <textarea id="src"></textarea>
+  </body>
+</html>
