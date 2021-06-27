@@ -3,40 +3,49 @@
   <head>
     <meta charset="utf-8">
     <title>囲みマス</title>
-    <link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="codemirror/codemirror.css">
     <link rel="stylesheet" href="desktop.css">
-    <script src="node_modules/codemirror/lib/codemirror.js"></script>
-    <script src="node_modules/codemirror/mode/javascript/javascript.js"></script>
+    <script src="codemirror/codemirror.js"></script>
+    <script src="codemirror/javascript.js"></script>
+    <script src="alpine/alpine.min.js"></script>
     <script src="native.js"></script>
     <script src="desktop.js"></script>
   </head>
-  <body onload="init()">
-    <div class="sidebar">
+  <body>
+    <div x-data="main()" x-init="init" class="sidebar">
       <fieldset>
         <legend>準備</legend>
-        <button onclick="installDeno()">Denoをインストール</button>
-        <button onclick="runServer()">サーバを起動</button>
+        <button @click="installDeno">Denoをインストール</button>
+        <button @click="runServer">サーバを起動</button>
       </fieldset>
       <fieldset>
         <legend>コード</legend>
-        <select id="p1"></select>
+        <select id="p1">
+          <template x-for="a in aiList">
+            <option :value="a" x-text="a"></option>
+          </template>
+        </select>
         <div style="display: flex;">
-          <button onclick="loadSrc()">開く</button>
-          <button onclick="openNewAIDialog()">新規</button>
-          <button onclick="saveSrc()">保存</button>
+          <button @click="loadSrc(p1.value)">開く</button>
+          <button @click="openNewAIDialog">新規</button>
+          <button @click="saveSrc">保存</button>
         </div>
       </fieldset>
       <fieldset>
         <legend>相手</legend>
-        <select id="p2"></select>
+        <select id="p2">
+          <template x-for="a in aiList">
+            <option :value="a" x-text="a"></option>
+          </template>
+        </select>
         <div style="display: flex;">
-          <button onclick="battle()">対戦</button>
-          <button onclick="benchmark()">ベンチマーク</button>
+          <button @click="battle">対戦</button>
+          <button @click="benchmark">ベンチマーク</button>
         </div>
       </fieldset>
       <fieldset>
         <legend>大会</legend>
-        <button onclick="openBrowser()">大会サイトを開く</button>
+        <button @click="openBrowser">大会サイトを開く</button>
         <div>
           ログインしてアクセスキーを取得してください
         </div>

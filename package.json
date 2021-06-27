@@ -9,7 +9,6 @@
   "license": "MIT",
   "dependencies": {
     "nw": "^0.54.0",
-    "nw-builder": "^3.5.7",
-    "codemirror": "^5.62.0"
+    "nw-builder": "^3.5.7"
   }
 }
