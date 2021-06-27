@@ -1,0 +1,15 @@
+{
+  "name": "kakomimasu-desktop",
+  "version": "1.0.0",
+  "main": "desktop.html",
+  "scripts": {
+    "start": "nw .",
+    "build": "nwbuild -p win64 -o build/ ./"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "nw": "^0.54.0",
+    "nw-builder": "^3.5.7",
+    "codemirror": "^5.62.0"
+  }
+}

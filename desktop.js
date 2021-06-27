@@ -1,46 +1,41 @@
 moveTo(100, 100)
 resizeTo(1000, 1000)
 
-function init() {
-  a = 12
+async function init() {
   editor = CodeMirror.fromTextArea(src, {
     mode: "javascript"
   })
-  reloadAIList()
-  loadSrc()
+  await reloadAIList()
+  await loadSrc()
 }
 
 function installDeno() {
   native.exec(
-    "powershell",
-    "iwr https://deno.land/x/install/install.ps1 -useb | iex"
+    "start powershell -c \"iwr https://deno.land/x/install/install.ps1 -useb | iex\""
   )
 }
 
 function runServer() {
   native.exec(
-    "deno",
-    "run -A kakomimasu\\apiserver\\apiserver.ts"
+    "start cmd /c \"deno run -A kakomimasu\\apiserver\\apiserver.ts\""
   )
 }
 
 function runClient(name) {
   native.exec(
-    "deno",
-    "run -A kakomimasu\\client_deno\\" + name + " --local"
+    "start cmd /c \"deno run -A kakomimasu\\client_deno\\" + name + " --local\""
   )
 }
 
 function battle() {
-  // window.showModelessDialog("launcher.hta","5","dialogHeight:400px;dialogWidth:300px")
   runClient(p1.value)
   setTimeout(function() {
     runClient(p2.value)
   }, 100)
-  native.exec("http://localhost:8880/game/detail")
+  native.exec("start http://localhost:8880/game/detail")
 }
 
-function openNewAIDialog() {
+async function openNewAIDialog() {
   let name
   while (true) {
     name = prompt("AI名を入力してください", "")
@@ -48,13 +43,13 @@ function openNewAIDialog() {
       return
     }
     name += ".js"
-    let path = copyTemplate(name)
+    let path = await copyTemplate(name)
     if (path != null) {
       break
     }
     alert("他の名前を入力してください")
   }
-  reloadAIList()
+  await reloadAIList()
   for (let i = 0; i < p1.options.length; i++) {
     let a = p1.options[i]
     if (a.value === name) {
@@ -62,26 +57,26 @@ function openNewAIDialog() {
       break
     }
   }
-  loadSrc()
+  await loadSrc()
 }
 
-function loadSrc() {
-  editor.setValue(native.load("kakomimasu\\client_deno\\" + p1.value))
+async function loadSrc() {
+  editor.setValue(await native.load("kakomimasu\\client_deno\\" + p1.value))
 }
 
 function saveSrc() {
   native.save(editor.getValue(), "kakomimasu\\client_deno\\" + p1.value)
 }
 
-function copyTemplate(name) {
-  let src = native.load("kakomimasu\\client_deno\\client_template.js")
+async function copyTemplate(name) {
+  let src = await native.load("client_template.js")
   let path = "kakomimasu\\client_deno\\" + name
   if (native.exists(path)) {
     return null
   }
   let re = new RegExp("#NAME#", "g")
   src = src.replace(re, name)
-  native.save(path, src)
+  await native.save(path, src)
   return path
 }
 
@@ -90,10 +85,10 @@ function endsWith(target, str) {
   return target.match(reg)
 }
 
-function reloadAIList() {
+async function reloadAIList() {
   p1.innerHTML = ""
   p2.innerHTML = ""
-  let list = native.files("kakomimasu\\client_deno")
+  let list = await native.files("kakomimasu\\client_deno")
   let ignores = [
     "action.js",
     "algorithm.js",
@@ -122,9 +117,9 @@ function reloadAIList() {
 
 function benchmark() {
   // benchmark.jsの引数対応
-  native.exec("deno", "run -A kakomimasu\\apiserver\\benchmark.js")
+  native.exec("start cmd /c \"deno run -A kakomimasu\\apiserver\\benchmark.js\"")
 }
 
 function openBrowser() {
-  native.exec('https://practice.kakomimasu.website/')
+  native.exec('start https://practice.kakomimasu.website/')
 }

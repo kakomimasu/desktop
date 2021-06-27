@@ -1,49 +1,20 @@
+const { exec } = require("child_process")
+const fs = require("fs").promises
+
 let native = {
-  exec: function(cmd, param) {
-    let sh = new ActiveXObject("Shell.Application")
-    sh.ShellExecute(cmd, param)
+  exec: function(cmd) {
+    exec(cmd)
   },
-  load: function(file) {
-    let ado = new ActiveXObject("ADODB.Stream")
-    ado.Type = 2
-    ado.Charset = "utf-8"
-    ado.Open()
-    ado.LoadFromFile(file)
-    let a = ado.ReadText(-1)
-    ado.Close()
-    return a
+  load: async function(file) {
+    return (await fs.readFile(file)).toString()
   },
-  save: function(file, data) {
-    let ado = new ActiveXObject("ADODB.Stream")
-    ado.Type = 2
-    ado.Charset = "utf-8"
-    ado.Open()
-    ado.WriteText(data)
-    ado.SaveToFile(file, 2)
-    ado.Close()
+  save: async function(file, data) {
+    await fs.writeFile(file, data)
   },
   exists: function(file) {
-    let fso = new ActiveXObject("Scripting.FileSystemObject")
-    return fso.FileExists(file)
+    return require("fs").existsSync(file)
   },
-  files: function(dir) {
-    let fso = new ActiveXObject("Scripting.FileSystemObject")
-    let d = fso.GetFolder(dir)
-    let files = new Enumerator(d.files)
-    let ignores = [
-      "action.js",
-      "algorithm.js",
-      "benchmark.js",
-      "client_template.js",
-      "client_util.js",
-      "kacom.js",
-      "KakomimasuClient.js",
-      "kidou.js"
-    ]
-    let list = []
-    for (; !files.atEnd(); files.moveNext()) {
-      list.push(fso.GetFileName(files.item()))
-    }
-    return list
+  files: async function(dir) {
+    return await fs.readdir(dir)
   }
 }
