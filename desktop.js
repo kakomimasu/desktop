@@ -1,5 +1,8 @@
 import { h, render } from "https://unpkg.com/preact@latest?module"
-import { useState, useEffect, useRef } from "https://unpkg.com/preact@latest/hooks/dist/hooks.module.js?module"
+import { useState, useCallback, useEffect, useRef } from "https://unpkg.com/preact@latest/hooks/dist/hooks.module.js?module"
+import htm from "https://unpkg.com/htm?module"
+
+const html = htm.bind(h)
 
 moveTo(100, 100)
 resizeTo(1000, 600)
@@ -11,37 +14,33 @@ const App = () => {
   const [currentFile, setCurrentFile] = useState()
   const textarea = useRef()
   const [codeMirror, setCodeMirror] = useState()
+  const [reload, setReload] = useState(true)
 
-  useEffect(async () => {
-    setCodeMirror(CodeMirror.fromTextArea(textarea.current, { mode: "javascript" }))
-    await reloadAIList()
-  }, [])
-
-  const installDeno = () => {
+  const installDeno = useCallback(() => {
     native.exec(
       "start powershell -c \"iwr https://deno.land/x/install/install.ps1 -useb | iex\""
     )
-  }
+  }, [])
 
-  const runServer = () => {
+  const runServer = useCallback(() => {
     native.exec(
       "start cmd /c \"deno run -A server\\server.ts\""
     )
-  }
+  }, [])
 
-  const runClient = name => {
+  const runClient = useCallback(name => {
     native.exec(
       "start cmd /c \"deno run -A client-deno\\" + name + " --local\""
     )
-  }
+  }, [])
 
-  const battle = () => {
+  const battle = useCallback(() => {
     runClient(player1File)
     setTimeout(() => runClient(player2File), 100)
     native.exec("start http://localhost:8880/game/detail")
-  }
+  }, [player1File, player2File])
 
-  const openNewAIDialog = async () => {
+  const openNewAIDialog = useCallback(async () => {
     let name
     while (true) {
       name = prompt("AI名を入力してください", "")
@@ -55,20 +54,20 @@ const App = () => {
       }
       alert("他の名前を入力してください")
     }
-    await reloadAIList()
+    setReload(true)
     setPlayer1File(name)
     setCurrentFile(name)
-  }
+  }, [])
 
-  const loadSrc = () => {
+  const loadSrc = useCallback(() => {
     setCurrentFile(player1File)
-  }
+  }, [player1File])
   
-  const saveSrc = async () => {
+  const saveSrc = useCallback(async () => {
     await native.save("client-deno\\" + currentFile, codeMirror.getValue())
-  }
+  }, [currentFile, codeMirror])
 
-  const copyTemplate = async name => {
+  const copyTemplate = useCallback(async name => {
     let src = await native.load("client_template.js")
     let path = "client-deno\\" + name
     if (native.exists(path)) {
@@ -77,9 +76,25 @@ const App = () => {
     src = src.replace(/#NAME#/g, name)
     await native.save(path, src)
     return path
-  }
+  }, [])
 
-  const reloadAIList = async () => {
+  const benchmark = useCallback(() => {
+    // benchmark.jsの引数対応
+    native.exec("start cmd /c \"deno run -A kakomimasu\\apiserver\\benchmark.js\"")
+  }, [])
+  
+  const openBrowser = useCallback(() => {
+    native.exec('start https://practice.kakomimasu.website/')
+  }, [])
+
+  useEffect(async () => {
+    setCodeMirror(CodeMirror.fromTextArea(textarea.current, { mode: "javascript" }))
+  }, [])
+
+  useEffect(async () => {
+    if (!reload) {
+      return
+    }
     const ignores = [
       "action.js",
       "algorithm.js",
@@ -91,7 +106,8 @@ const App = () => {
       "kidou.js"
     ]
     setAiList((await native.files("client-deno")).filter(a => a.endsWith(".js") && ignores.indexOf(a) == -1))
-  }
+    setReload(false)
+  }, [reload])
 
   useEffect(() => {
     if (aiList.length == 0) {
@@ -112,15 +128,6 @@ const App = () => {
     }
   }, [aiList])
 
-  const benchmark = () => {
-    // benchmark.jsの引数対応
-    native.exec("start cmd /c \"deno run -A kakomimasu\\apiserver\\benchmark.js\"")
-  }
-  
-  const openBrowser = () => {
-    native.exec('start https://practice.kakomimasu.website/')
-  }
-
   useEffect(async () => {
     if (!currentFile) {
       return
@@ -129,45 +136,50 @@ const App = () => {
     codeMirror.setValue(src)
   }, [currentFile])
 
-  return (
-    h("React.Fragment", null,
-      h("div", { class: "sidebar" },
-        h("fieldset", null,
-          h("legend", null, "準備"),
-          h("button", { onClick: installDeno }, null, "Denoをインストール"),
-          h("button", { onClick: runServer }, null, "サーバを起動")
-        ),
-        h("fieldset", null,
-          h("legend", null, "コード"),
-          h("select", { onChange: e => setPlayer1File(e.target.value) },
-            aiList.map(a => h("option", { value: a, selected: a == player1File }, a))
-          ),
-          h("div", { style: { display: "flex" } },
-            h("button", { onClick: loadSrc }, "開く"),
-            h("button", { onClick: openNewAIDialog }, "新規"),
-            h("button", { onClick: saveSrc }, "保存")
-          )
-        ),
-        h("fieldset", null,
-          h("legend", null, "相手"),
-          h("select", { onChange: e => setPlayer2File(e.target.value) },
-            aiList.map(a => h("option", { value: a }, a))
-          ),
-          h("div", { style: { display: "flex" } },
-            h("button", { onClick: battle }, "対戦"),
-            h("button", { onClick: benchmark }, "ベンチマーク")
-          )
-        ),
-        h("fieldset", null,
-          h("legend", null, "大会"),
-          h("button", { onClick: openBrowser }, "大会サイトを開く"),
-          h("div", null, "ログインしてアクセスキーを取得してください"),
-          h("button", null, "AIをサーバに接続")
-        )
-      ),
-      h("textarea", { ref: textarea })
-    )
-  )
+  return html`
+    <div class="sidebar">
+      <fieldset>
+        <legend>準備</legend>
+        <button onClick=${installDeno}>Denoをインストール</button>
+        <button onClick=${runServer}>サーバを起動</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>コード</legend>
+        <select onChange=${e => setPlayer1File(e.target.value)}>
+          ${aiList.map(a => html`
+            <option value=${a} selected=${a == player1File}>${a}</option>
+          `)}
+        </select>
+        <div style="display: flex">
+          <button onClick=${loadSrc}>開く</div>
+          <button onClick=${openNewAIDialog}>新規</div>
+          <button onClick=${saveSrc}>保存</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>相手</legend>
+        <select onChange=${e => setPlayer2File(e.target.value)}>
+          ${aiList.map(a => html`
+            <option value=${a}>${a}</option>
+          `)}
+        </select>
+        <div style="display: flex">
+          <button onClick=${battle}>対戦</div>
+          <button onClick=${benchmark}>ベンチマーク</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>大会</legend>
+        <button onClick=${openBrowser}>大会サイトを開く</button>
+        <div>ログインしてアクセスキーを取得してください</div>
+        <button>AIをサーバに接続</button>
+      </fieldset>
+    </div>
+    <textarea ref=${textarea}></textarea>
+  `
 }
 
 render(h((App)), document.body)
