@@ -7,51 +7,9 @@
     <link rel="stylesheet" href="desktop.css">
     <script src="codemirror/codemirror.js"></script>
     <script src="codemirror/javascript.js"></script>
-    <script src="alpine/alpine.min.js"></script>
     <script src="native.js"></script>
-    <script src="desktop.js"></script>
+    <script type="module" src="desktop.js"></script>
   </head>
   <body>
-    <div x-data="main()" x-init="init" class="sidebar">
-      <fieldset>
-        <legend>準備</legend>
-        <button @click="installDeno">Denoをインストール</button>
-        <button @click="runServer">サーバを起動</button>
-      </fieldset>
-      <fieldset>
-        <legend>コード</legend>
-        <select id="p1">
-          <template x-for="a in aiList">
-            <option :value="a" x-text="a"></option>
-          </template>
-        </select>
-        <div style="display: flex;">
-          <button @click="loadSrc(p1.value)">開く</button>
-          <button @click="openNewAIDialog">新規</button>
-          <button @click="saveSrc">保存</button>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>相手</legend>
-        <select id="p2">
-          <template x-for="a in aiList">
-            <option :value="a" x-text="a"></option>
-          </template>
-        </select>
-        <div style="display: flex;">
-          <button @click="battle">対戦</button>
-          <button @click="benchmark">ベンチマーク</button>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>大会</legend>
-        <button @click="openBrowser">大会サイトを開く</button>
-        <div>
-          ログインしてアクセスキーを取得してください
-        </div>
-        <button>AIをサーバに接続</button><br>
-      </fieldset>
-    </div>
-    <textarea id="src"></textarea>
   </body>
 </html>

@@ -1,3 +1,6 @@
-[submodule "kakomimasu"]
-	path = kakomimasu
-	url = https://github.com/codeforkosen/Kakomimasu
+[submodule "server"]
+	path = server
+	url = https://github.com/kakomimasu/server.git
+[submodule "client-deno"]
+	path = client-deno
+	url = https://github.com/kakomimasu/client-deno.git

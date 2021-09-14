@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "nw": "^0.54.0",
+    "nw": "^0.55.0",
     "nw-builder": "^3.5.7"
   }
 }
