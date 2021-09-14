@@ -35,6 +35,7 @@ const App = () => {
   }, [])
 
   const battle = useCallback(() => {
+    saveSrc()
     runClient(player1File)
     setTimeout(() => runClient(player2File), 100)
     native.exec("start http://localhost:8880/game/detail")
@@ -47,7 +48,6 @@ const App = () => {
       if (name == null || name === "") {
         return
       }
-      name += ".js"
       let path = await copyTemplate(name)
       if (path != null) {
         break
@@ -55,6 +55,7 @@ const App = () => {
       alert("他の名前を入力してください")
     }
     setReload(true)
+    name += ".js"
     setPlayer1File(name)
     setCurrentFile(name)
   }, [])
@@ -69,7 +70,7 @@ const App = () => {
 
   const copyTemplate = useCallback(async name => {
     let src = await native.load("client_template.js")
-    let path = "client-deno\\" + name
+    let path = "client-deno\\" + name + ".js"
     if (native.exists(path)) {
       return null
     }
@@ -84,7 +85,7 @@ const App = () => {
   }, [])
   
   const openBrowser = useCallback(() => {
-    native.exec('start https://practice.kakomimasu.website/')
+    native.exec('start https://kakomimasu.website/')
   }, [])
 
   useEffect(async () => {
@@ -167,15 +168,19 @@ const App = () => {
         </select>
         <div style="display: flex">
           <button onClick=${battle}>対戦</div>
+          <!--
           <button onClick=${benchmark}>ベンチマーク</div>
+          -->
         </div>
       </fieldset>
 
       <fieldset>
         <legend>大会</legend>
         <button onClick=${openBrowser}>大会サイトを開く</button>
+        <!--
         <div>ログインしてアクセスキーを取得してください</div>
         <button>AIをサーバに接続</button>
+        -->
       </fieldset>
     </div>
     <textarea ref=${textarea}></textarea>
