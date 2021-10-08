@@ -95,7 +95,7 @@ window.main = () => ({
     native.exec("start cmd /c \"deno run -A kakomimasu\\apiserver\\benchmark.js\"")
   },
   openBrowser() {
-    native.exec('start https://practice.kakomimasu.website/')
+    native.exec('start https://practice.kakomimasu.com/')
   }
 })
 
